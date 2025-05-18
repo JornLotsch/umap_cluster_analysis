@@ -6,13 +6,8 @@
 #' Provides options for data preprocessing and UMAP parameter tuning.
 #'
 #' @param X Data frame or matrix containing input data
-#' @param target Optional vector of target values for supervised projection
 #' @param seed Integer, random seed for reproducibility (default: 42)
-#' @param n_neighbors Integer, number of neighbors for UMAP (default: 15)
-#' @param min_dist Numeric, minimum distance parameter for UMAP (default: 0.1)
-#' @param n_components Integer, number of dimensions for projection (default: 2)
 #' @param scaleX Logical, whether to scale input data (default: TRUE)
-#' @param metric Character, distance metric for UMAP (default: "euclidean")
 #'
 #' @return A list containing:
 #'   \item{Projected}{Data frame with projected coordinates}

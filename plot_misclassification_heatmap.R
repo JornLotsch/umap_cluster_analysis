@@ -21,13 +21,14 @@
 #' @importFrom ggplot2 ggplot geom_tile scale_fill_manual theme_minimal labs theme element_text element_rect element_blank
 #' @importFrom tidyr pivot_longer
 #' @importFrom scales alpha
-plot_misclassification_heatmap <- function(data,
-                                           prior_class_col = "Target",
-                                           cluster_col = "Cluster",
-                                           label_col = NULL,
-                                           title = "Cluster Assignments and Misclassifications",
-                                           row_font_size = 6) {
-
+plot_misclassification_heatmap <- function(
+  data,
+  prior_class_col = "Target",
+  cluster_col = "Cluster",
+  label_col = NULL,
+  title = "Cluster Assignments and Misclassifications",
+  row_font_size = 6
+) {
   # Check required packages
   required_packages <- c("ggplot2", "tidyr", "scales")
   for (pkg in required_packages) {
@@ -37,127 +38,96 @@ plot_misclassification_heatmap <- function(data,
   }
 
   # Input validation
-  if (!is.data.frame(data)) {
-    stop("Input must be a data frame")
-  }
-
-  if (!(prior_class_col %in% colnames(data))) {
-    stop(paste("Column", prior_class_col, "not found in data"))
-  }
-
-  if (!(cluster_col %in% colnames(data))) {
-    stop(paste("Column", cluster_col, "not found in data"))
-  }
+  if (!is.data.frame(data)) stop("Input must be a data frame")
+  if (!(prior_class_col %in% colnames(data))) stop(paste("Column", prior_class_col, "not found in data"))
+  if (!(cluster_col %in% colnames(data))) stop(paste("Column", cluster_col, "not found in data"))
+  if (!is.null(label_col) && !(label_col %in% colnames(data))) stop(paste("Label column", label_col, "not found in data"))
 
   # Use row names if label column not specified
-  if (is.null(label_col)) {
-    if (!is.null(rownames(data))) {
-      data$row_label <- rownames(data)
-    } else {
-      data$row_label <- 1:nrow(data)
-    }
+  row_label <- if (is.null(label_col)) {
+    rn <- rownames(data)
+    if (!is.null(rn) && all(rn != "")) rn else as.character(seq_len(nrow(data)))
   } else {
-    if (!(label_col %in% colnames(data))) {
-      stop(paste("Label column", label_col, "not found in data"))
-    }
-    data$row_label <- data[[label_col]]
+    as.character(data[[label_col]])
   }
 
-  # Create a clean data frame with just what we need
+  # Coerce prior_class and cluster to character for reliable comparison, do NOT mutate original data
+  prior_class <- as.character(data[[prior_class_col]])
+  cluster <- as.character(data[[cluster_col]])
+
+  # Determine misclassification (robust to type mismatches)
+  misclassified <- ifelse(prior_class == cluster, 0L, 1L)
+
   clean_data <- data.frame(
-    row_label = data$row_label,
-    prior_class = as.factor(data[[prior_class_col]]),
-    cluster = as.factor(data[[cluster_col]])
+    row_label = row_label,
+    prior_class = prior_class,
+    cluster = cluster,
+    misclassified = misclassified,
+    stringsAsFactors = FALSE
   )
 
-  # Determine misclassified cases
-  clean_data$misclassified <- ifelse(
-    clean_data$prior_class == clean_data$cluster,
-    0,  # Not misclassified
-    1   # Misclassified
-  )
-
-  # Transform to long format for plotting
+  # Prepare data for heatmap in long format
   prepare_long_data <- function(df) {
-    # Create data columns for the heatmap
     df_plot <- data.frame(
       row = df$row_label,
       prior_class = df$prior_class,
       cluster = df$cluster,
-      misclassified = df$misclassified
+      misclassified = ifelse(df$misclassified == 1L, "Misclassified", "Not misclassified"),
+      stringsAsFactors = FALSE
     )
-
-    # Convert misclassified to factor with specific coding for coloring
-    # Use an offset higher than any cluster number to ensure it has a unique color
-    max_cluster_num <- max(as.numeric(df_plot$prior_class), as.numeric(df_plot$cluster))
-    df_plot$misclassified <- as.factor(df_plot$misclassified * (max_cluster_num + 1))
-
-    # Convert all columns to character for consistent transformation
-    cols_to_convert <- c("prior_class", "cluster", "misclassified")
-    df_plot[cols_to_convert] <- lapply(df_plot[cols_to_convert], as.character)
-
-    # Transform to long format
+    # Gather to long format
     df_long <- tidyr::pivot_longer(
       df_plot,
-      cols = cols_to_convert,
+      cols = c("prior_class", "cluster", "misclassified"),
       names_to = "column",
       values_to = "value"
     )
-
-    # Reverse order of rows for proper display (top to bottom)
+    # Reverse row order for heatmap display
     df_long$row <- factor(df_long$row, levels = rev(unique(df_long$row)))
-
-    # Define the order for columns (x-axis)
-    column_order <- c("prior_class", "cluster", "misclassified")
-    df_long$column <- factor(df_long$column, levels = column_order)
-
-    # Make column names more readable
-    levels(df_long$column) <- c("Prior Class", "Cluster", "Misclassified")
-
-    return(df_long)
+    df_long$column <- factor(df_long$column, levels = c("prior_class", "cluster", "misclassified"),
+                             labels = c("Prior Class", "Cluster", "Misclassified"))
+    df_long
   }
-
-  # Prepare long format data
   df_long <- prepare_long_data(clean_data)
 
-  # Extended colorblind palette from plot_umap_with_voronoi
-  cb_palette <- c(
-    "#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00",
-    "#CC79A7", "#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2",
-    "#D55E00", "#CC79A7"
+  # Build colorblind-friendly palette (expand if needed) for all unique class/cluster values
+  cluster_levels <- sort(unique(c(clean_data$prior_class, clean_data$cluster)))
+  n_clusters <- length(cluster_levels)
+  cb_palette_base <- c(
+    "#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7", "#999999",
+    "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7"
   )
+  if (n_clusters > length(cb_palette_base)) {
+    more_cols <- grDevices::rainbow(n_clusters - length(cb_palette_base))
+    cb_palette <- c(cb_palette_base, more_cols)
+  } else {
+    cb_palette <- cb_palette_base
+  }
+  col_vals <- setNames(cb_palette[seq_len(n_clusters)], cluster_levels)
 
-  # Get all unique values (all possible clusters plus 0 and misclassified marker)
-  unique_values <- unique(df_long$value)
-  misclassified_value <- unique(df_long$value[df_long$column == "Misclassified" & df_long$value != "0"])
+  # Specify color mapping for legend values
+  value_levels <- c(cluster_levels, "Not misclassified", "Misclassified")
+  fill_colors <- c(col_vals, "Not misclassified" = "lightyellow", "Misclassified" = "salmon")
 
-  # Create a color mapping with fixed colors for "0" and misclassified
-  # and cb_palette colors for actual clusters
-  color_mapping <- setNames(
-    c("lightyellow", cb_palette[1:(length(unique_values)-2)], "salmon"),
-    c("0", setdiff(setdiff(unique_values, "0"), misclassified_value), misclassified_value)
-  )
+  # Set the factor level order for fill
+  df_long$value <- factor(df_long$value, levels = value_levels)
 
-  # Create labels for legend
-  label_mapping <- setNames(
-    c("Not misclassified",
-      paste("Class/cluster", setdiff(setdiff(unique_values, "0"), misclassified_value)),
-      "Misclassified"),
-    c("0", setdiff(setdiff(unique_values, "0"), misclassified_value), misclassified_value)
-  )
+  # Legend labels mapping
+  legend_labels <- c(setNames(paste("Class/cluster", cluster_levels), cluster_levels),
+                     "Not misclassified" = "Not misclassified",
+                     "Misclassified" = "Misclassified")
 
   # Calculate misclassification rate
-  misclass_rate <- round(100 * sum(clean_data$misclassified) / nrow(clean_data), 1)
+  misclass_rate <- round(100 * mean(clean_data$misclassified == 1L), 1)
   subtitle <- paste0("Misclassification rate: ", misclass_rate, "%")
 
-  # Create ggplot2 heatmap
-  ggplot_heatmap <- ggplot2::ggplot(df_long, ggplot2::aes(x = column, y = row, fill = factor(value))) +
+  plot <- ggplot2::ggplot(df_long, ggplot2::aes(x = column, y = row, fill = value)) +
     ggplot2::geom_tile(color = "white", size = 0.5) +
     ggplot2::scale_fill_manual(
-      values = color_mapping,
+      values = fill_colors,
       na.value = "white",
-      name = "Classification",
-      labels = label_mapping
+      name = "Assignment",
+      labels = legend_labels
     ) +
     ggplot2::theme_minimal(base_size = 14) +
     ggplot2::labs(
@@ -173,12 +143,10 @@ plot_misclassification_heatmap <- function(data,
       panel.grid = ggplot2::element_blank(),
       axis.ticks = ggplot2::element_blank()
     )
-
-  # Return the plot and data
-  return(list(
-    plot = ggplot_heatmap,
+  list(
+    plot = plot,
     data = clean_data,
     long_data = df_long,
     misclassification_rate = misclass_rate
-  ))
+  )
 }

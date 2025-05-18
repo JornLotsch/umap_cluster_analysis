@@ -38,11 +38,7 @@ plot_umap_with_voronoi <- function(umap_projection,
   shape_values <- c(17, 16, 15, 18, 2, 1, 0, 5, 7, 8, 9, 19, 11, 12)
 
   # Extract data if input is the result from perform_umap_projection
-  if ("Projected" %in% names(umap_projection)) {
-    X <- umap_projection$Projected
-  } else {
     X <- umap_projection
-  }
 
   # Initial checks of arguments
   if (ncol(X) < 2) stop("The projection data must have at least two columns.")
@@ -57,7 +53,6 @@ plot_umap_with_voronoi <- function(umap_projection,
     }
   }
 
-  # Data preparation
   plotData <- data.frame(
     Proj1 = X[, 1],
     Proj2 = X[, 2],
@@ -65,8 +60,11 @@ plot_umap_with_voronoi <- function(umap_projection,
     Label = labels
   )
 
+  # Ensure Target is a factor for consistent coloring/shaping
+  plotData$Target <- as.factor(plotData$Target)
+
   # Ensure we have enough colors for all target values
-  unique_targets <- unique(targets)
+  unique_targets <- unique(plotData$Target)
   target_palette <- rep(cb_palette, length.out = length(unique_targets))
 
   # Voronoi diagram computation
@@ -97,7 +95,7 @@ plot_umap_with_voronoi <- function(umap_projection,
         shape = as.factor(Target)
       )
     ) +
-    ggplot2::theme_light() +
+    ggplot2::theme_light(base_size = 14) +
     ggplot2::theme(
       legend.position = "inside",
       legend.position.inside = c(0.5, 0.08),
@@ -108,7 +106,7 @@ plot_umap_with_voronoi <- function(umap_projection,
         fill = ggplot2::alpha("white", 0.2)
       )
     ) +
-    ggplot2::labs(x = "UMAP 1", y = "UMAP 2", color = "Target", fill = "Target", shape = "Target") +
+    ggplot2::labs(title = "UMAP projection", x = "UMAP 1", y = "UMAP 2", color = "Target", fill = "Target", shape = "Target") +
     ggplot2::scale_shape_manual(values = shape_values) +
     ggplot2::scale_fill_manual(values = target_palette) +
     ggplot2::scale_color_manual(values = target_palette) +
