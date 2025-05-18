@@ -31,7 +31,6 @@ Clone this repository and source the function in your R environment:
 
 Below is a complete example of running UMAP-based clustering and checking for misclassifications.
 
-r
 # Load your data frame: each row is a sample, each column a feature (e.g., lipid species)
 lipid_profiles <- read.csv("lipid_profiles.csv")
 # Load or extract your class labels for each sample
