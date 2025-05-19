@@ -46,7 +46,8 @@ print(results$umap_plot)
 =======
 # Optionally: view UMAP Voronoi plot object
 print(results$voronoi_plot)
->>>>>>> Stashed changes
+
+<img src="./umap_analysis_combined.svg">
 
 ---
 
