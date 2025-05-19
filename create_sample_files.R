@@ -1,50 +1,46 @@
-# Example: Generate toy data files for umap_cluster_analysis demonstration
+# create_sample_lipidomics_data.R
 
-# This script creates two example CSV files:
-#   1. 'lipid_profiles.csv'  -- Simulated feature data (samples x lipid features)
-#   2. 'sample_metadata.csv' -- Sample info (SampleID + SampleType/class)
+set.seed(123)  # For reproducibility
 
-# These files are compatible with the example in the README.
+n_samples <- 100         # Total samples
+n_features <- 8          # Features (lipids)
+samples_per_class <- 50  # 2 classes, balanced
 
-# ------------------------------
-# Set parameters for toy data
-set.seed(42)  # For reproducibility
+# Sample IDs
+sample_ids <- sprintf("S%03d", 1:n_samples)
+# Class assignment
+sample_types <- rep(c("ClassA", "ClassB"), each = samples_per_class)
 
-n_samples <- 20         # Number of samples
-n_features <- 8         # Number of lipid features
+# Simulate base features: both classes start similar
+feature_matrix <- matrix(rnorm(n_samples * n_features, mean = 0, sd = 1),
+                         nrow = n_samples, ncol = n_features)
 
-# Generate Sample IDs: "S1", "S2", ..., "S20"
-sample_ids <- paste0("S", seq_len(n_samples))
+# Add group-specific differences to promote class separation for UMAP
+# ClassA: shift Lipid1, Lipid2 higher
+feature_matrix[1:samples_per_class, 1:2] <- feature_matrix[1:samples_per_class, 1:2] + 2
+# ClassB: shift Lipid5, Lipid6 higher
+feature_matrix[(samples_per_class+1):n_samples, 5:6] <- feature_matrix[(samples_per_class+1):n_samples, 5:6] + 2
 
-# Assign sample types (e.g., two experimental groups)
-sample_types <- rep(c("Control", "Case"), length.out = n_samples)
+# Add a bit of random noise to a few samples to simulate misclassification potential
+n_errors <- 6
+error_indices <- sample(1:n_samples, n_errors)
+feature_matrix[error_indices, ] <- feature_matrix[error_indices, ] + rnorm(n_errors * n_features, mean = 0, sd = 2)
 
-# Create feature matrix: random normal features, with shift for "Case" group
-feature_matrix <- matrix(
-  rnorm(n_samples * n_features, mean = 0, sd = 1),
-  nrow = n_samples, ncol = n_features
-)
-# Add a shift to "Case" samples to simulate group differences
-feature_matrix[sample_types == "Case", ] <- feature_matrix[sample_types == "Case", ] + 1.5
+# Name the features "Lipid1"..."Lipid8"
+colnames(feature_matrix) <- paste0("Lipid", 1:n_features)
 
-# Name the feature columns: Lipid1, Lipid2, ..., Lipid8
-colnames(feature_matrix) <- paste0("Lipid", seq_len(n_features))
-
-# Create DataFrame for features (each row = one sample)
+# Create and write lipid profile data frame
 lipid_profiles <- as.data.frame(feature_matrix)
-rownames(lipid_profiles) <- sample_ids
+lipid_profiles$SampleID <- sample_ids  # Optionally, include SampleID as a column
+# Usually features-only file: remove SampleID
+write.csv(lipid_profiles[, 1:n_features], "lipid_profiles.csv", row.names = FALSE)
 
-# Write features to 'lipid_profiles.csv'
-write.csv(lipid_profiles, "lipid_profiles.csv", row.names = FALSE)
-
-# Create DataFrame for sample metadata (SampleID and SampleType)
+# Sample metadata: SampleID and Class label
 sample_metadata <- data.frame(
   SampleID = sample_ids,
   SampleType = sample_types,
   stringsAsFactors = FALSE
 )
-
-# Write metadata to 'sample_metadata.csv'
 write.csv(sample_metadata, "sample_metadata.csv", row.names = FALSE)
 
-# After running this script, you will have two CSV files ready to use with umap_cluster_analysis!
+cat("Created arbitrary lipid_profiles.csv and sample_metadata.csv for UMAP cluster analysis example.\n")

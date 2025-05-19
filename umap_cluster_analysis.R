@@ -50,6 +50,7 @@ source_required_functions <- function() {
 #' @param width Numeric, plot width in inches (default: 12)
 #' @param height Numeric, plot height in inches (default: 9)
 #' @param dpi Integer, resolution for PNG output (default: 300)
+#' @param n_neighbors Integer, number of nearest neighbors used in UMAP (default: 15)
 #'
 #' @return A list containing all analysis components:
 #'   \item{prepared_data}{Data frame with prepared input data}
@@ -74,7 +75,8 @@ umap_cluster_analysis <- function(data,
                                   row_font_size = 6,
                                   width = 12,
                                   height = 9,
-                                  dpi = 300) {
+                                  dpi = 300,
+                                  n_neighbors = 15) {
 
   # --- Input Validation ---
   if (!is.data.frame(data) && !is.matrix(data)) {
@@ -123,7 +125,7 @@ umap_cluster_analysis <- function(data,
 
   # --- Perform UMAP projection ---
   message("Performing UMAP projection...")
-  umap_result <- perform_umap_projection(data = prepared_data, seed = 42, scaleX = TRUE)
+  umap_result <- perform_umap_projection(data = prepared_data, seed = 42, scaleX = TRUE, n_neighbors = n_neighbors)
 
   # --- Perform clustering ---
   message("Performing clustering...")

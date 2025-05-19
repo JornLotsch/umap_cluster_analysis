@@ -8,6 +8,7 @@
 #' @param X Data frame or matrix containing input data
 #' @param seed Integer, random seed for reproducibility (default: 42)
 #' @param scaleX Logical, whether to scale input data (default: TRUE)
+#' @param n_neighbors Integer, number of nearest neighbors used in UMAP (default: 15)
 #'
 #' @return A list containing:
 #'   \item{Projected}{Data frame with projected coordinates}
@@ -18,7 +19,8 @@
 #' @importFrom stats scale
 perform_umap_projection <- function(data,
                                     seed = 42,
-                                    scaleX = TRUE) {
+                                    scaleX = TRUE,
+                                    n_neighbors = 15) {
 
   # Validate inputs
   if (!is.data.frame(data) && !is.matrix(data)) stop("Data must be a data frame or matrix.")
@@ -56,9 +58,11 @@ perform_umap_projection <- function(data,
   # Set seed for reproducibility
   set.seed(seed)
 
-  # Perform UMAP projection
+  # Perform UMAP projection with specified n_neighbors
   message("Applying UMAP projection...")
-  res.umap <- umap::umap(data_clean)
+  umap_config <- umap::umap.defaults
+  umap_config$n_neighbors <- n_neighbors
+  res.umap <- umap::umap(data_clean, config = umap_config)
 
   # Extract projection coordinates
   projection <- res.umap$layout

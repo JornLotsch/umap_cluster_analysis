@@ -2,7 +2,7 @@
 
 ## Why umap_cluster_analysis?
 
-Laboratory errors in lipidomics can produce biologically plausible but incorrect results. Our package integrates dimensionality reduction with cluster analysis to detect these errors through an intuitive visual framework, enabling researchers to identify problematic samples before they impact downstream analyses.
+Laboratory errors in lipidomics can produce biologically plausible but incorrect results. This package integrates dimensionality reduction (UMAP) with cluster analysis (Ward’s hierarchical clustering) to detect such errors through an intuitive visual framework, enabling researchers to identify problematic samples before they impact downstream analyses.
 
 ## Ideal for
 
@@ -15,8 +15,8 @@ Laboratory errors in lipidomics can produce biologically plausible but incorrect
 ## Technical Highlights
 
 - ✅ **Comprehensive Analysis**: From raw data to final visualizations in a single function  
-- 📈 **Detailed Outputs**: Includes coordinates, clusters, visualizations, and a misclassified samples list  
-- 🧮 **Statistical Rigor**: Based on established dimensionality reduction and clustering algorithms  
+- 📈 **Detailed Outputs**: Includes UMAP coordinates, clusters, visualizations, and a misclassified samples list  
+- 🧮 **Statistical Rigor**: Uses established UMAP and hierarchical clustering algorithms for robust results  
 - 📊 **Publication-Ready Graphics**: Generates high-quality SVG/PNG outputs for direct use in publications  
 
 ---
@@ -40,9 +40,27 @@ results <- umap_cluster_analysis( data = lipid_profiles, # Features data target 
 #### Output misclassification rate and list which samples were misclassified
 cat("Sample misclassification rate:", sprintf("%.2f%%", results$misclassification_rate * 100), "\n")
 if (!is.null(resultsmisclassified_samples) && nrow(resultsmisclassified_samples) > 0) { cat("Misclassified samples:\n") print(results$misclassified_samples) } else { cat("No misclassified samples.\n") }
+<<<<<<< Updated upstream
 #### Optionally: view UMAP plot object, if provided
 print(results$umap_plot)
+=======
+# Optionally: view UMAP Voronoi plot object
+print(results$voronoi_plot)
+>>>>>>> Stashed changes
 
+---
+
+## Simulated Example Data Set
+
+This repository includes code to generate a synthetic (arbitrary) example data set resembling lipidomics profiles:
+
+- **lipid_profiles.csv**: Contains 100 samples, each with 8 “lipid” features (Lipid1 to Lipid8). Two classes (“ClassA” and “ClassB”; 50 samples each) are simulated such that each class shows increased values in a subset of features. Noise is added to a few samples to ensure the data can be misclassified by cluster analysis, offering a realistic test scenario.
+- **sample_metadata.csv**: Metadata with SampleIDs and their corresponding class label (“SampleType”).  
+- The data set is designed so that UMAP dimensionality reduction followed by Ward clustering mostly (but not perfectly) separates the two classes, mimicking real lipidomics experiments.
+
+To generate the example data:
+
+# See create_sample_lipidomics_data.R in the repository for reproducible example data creation.
 
 ---
 
@@ -52,6 +70,7 @@ print(results$umap_plot)
 - `target`: Vector or factor of true class labels.
 - `labels`: (Optional) Row labels for plotting and output (e.g., sample IDs).
 - `output_dir`: (Optional) Directory to save SVG/PNG plots and QC outputs.
+- `n_neighbors`: *(Optional, default = 15)* Integer; the size of the local neighborhood used by UMAP for manifold approximation. Adjust to control the local/global structure captured in the projection.
 
 ---
 
@@ -59,7 +78,7 @@ print(results$umap_plot)
 
 - **misclassification_rate**: Fraction of samples assigned to the wrong cluster, compared to ground truth labels.
 - **misclassified_samples**: Data frame listing the misclassified samples, their IDs, true labels, and predicted clusters.
-- **umap_plot**: R `ggplot2` object for the UMAP visualization (can be customized or exported).
+- **voronoi_plot**: R `ggplot2` object for the UMAP visualization (can be customized or exported).
 - **qc_results directory**: Contains publication-ready SVG/PNG plots and summary tables of clustering results.
 
 ---
@@ -73,9 +92,3 @@ If you use this tool in your work, please cite the repository or contact the mai
 ## License
 
 Distributed under the MIT License. See `LICENSE` for more information.
-
----
-
-## Contact
-
-For questions, issues, or feature requests, please open an issue on GitHub or contact the maintainer.
