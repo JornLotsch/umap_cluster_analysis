@@ -43,8 +43,6 @@ if (!is.null(resultsmisclassified_samples) && nrow(resultsmisclassified_samples)
 <<<<<<< Updated upstream
 #### Optionally: view UMAP plot object, if provided
 print(results$umap_plot)
-=======
-# Optionally: view UMAP Voronoi plot object
 print(results$voronoi_plot)
 
 <img src="./umap_analysis_combined.svg">
