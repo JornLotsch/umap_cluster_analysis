@@ -1,6 +1,6 @@
-# example_umap_cluster_analysis.R
+# example_umap_ward_misclassification_analysis.R
 
-# Example usage of umap_cluster_analysis
+# Example usage of umap_ward_misclassification_analysis
 
 # Load your data frame: each row is a sample, each column a feature (e.g., lipid species)
 lipid_profiles <- read.csv("lipid_profiles.csv")
@@ -10,7 +10,7 @@ sample_metadata <- read.csv("sample_metadata.csv")
 sample_types <- sample_metadata$SampleType
 
 # Run the integrated UMAP projection and clustering/misclassification analysis
-results <- umap_cluster_analysis(
+results <- umap_ward_misclassification_analysis(
   data = lipid_profiles,                 # Features data
   target = sample_types,                 # Ground truth (prior classes)
   labels = sample_metadata$SampleID,     # Optional: row labels for plots, if available
