@@ -47,7 +47,9 @@ labels = sample_metadata$SampleID, output_dir = "results")
 #### Output misclassification rate and list which samples were misclassified
 ```
 cat("Sample misclassification rate:", sprintf("%.2f%%", results$misclassification_rate * 100), "\n")
-if (!is.null(resultsmisclassified_samples) && nrow(resultsmisclassified_samples) > 0) { cat("Misclassified samples:\n") print(results$misclassified_samples) } else { cat("No misclassified samples.\n") }
+if (!is.null(resultsmisclassified_samples) && nrow(resultsmisclassified_samples) > 0) {
+cat("Misclassified samples:\n") print(results$misclassified_samples) } else { cat("No misclassified samples.\n")
+}
 ```
 #### Optionally: view UMAP plot object, if provided
 ```
