@@ -12,12 +12,12 @@ Laboratory errors can produce topically plausible but incorrect results. This pa
 - Biomarker discovery studies
 - Clinical research quality assurance
 
-## Technical Highlights
+## Technical highlights
 
-- ✅ **Comprehensive Analysis**: From raw data to final visualizations in a single function  
-- 📈 **Detailed Outputs**: Includes UMAP coordinates, clusters, visualizations, and a misclassified samples list  
-- 🧮 **Statistical Rigor**: Uses established UMAP and hierarchical clustering algorithms for robust results  
-- 📊 **Publication-Ready Graphics**: Generates high-quality SVG/PNG outputs for direct use in publications  
+- ✅ **Comprehensive analysis**: From raw data to final visualizations in a single function  
+- 📈 **Detailed outputs**: Includes UMAP coordinates, clusters, visualizations, and a misclassified samples list  
+- 🧮 **Statistical rigor**: Uses established UMAP and hierarchical clustering algorithms for robust results  
+- 📊 **Publication-ready graphics**: Generates high-quality SVG/PNG outputs for direct use in publications  
 
 ---
 
@@ -27,7 +27,7 @@ Clone this repository and source the function in your R environment:
 
 ---
 
-## Example Usage
+## Example usage
 
 Below is a complete example of running UMAP-based clustering and checking for misclassifications.
 
@@ -60,7 +60,7 @@ print(results$voronoi_plot)
 
 ---
 
-## Simulated Example Data Set
+## Simulated example data set
 
 This repository includes code to generate a synthetic (arbitrary) example data set resembling lipidomics profiles:
 
@@ -74,7 +74,7 @@ To generate the example data:
 
 ---
 
-## Function Arguments
+## Function arguments
 
 - `data`: Data frame or matrix of numeric features (samples in rows, features in columns).
 - `target`: Vector or factor of true class labels.
@@ -84,7 +84,7 @@ To generate the example data:
 
 ---
 
-## Output Explanation
+## Output explanation
 
 - **misclassification_rate**: Fraction of samples assigned to the wrong cluster, compared to ground truth labels.
 - **misclassified_samples**: Data frame listing the misclassified samples, their IDs, true labels, and predicted clusters.
