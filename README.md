@@ -32,19 +32,28 @@ Clone this repository and source the function in your R environment:
 Below is a complete example of running UMAP-based clustering and checking for misclassifications.
 
 #### Load your data frame: each row is a sample, each column a feature (e.g., lipid species)
+```
 lipid_profiles <- read.csv("lipid_profiles.csv")
+```
 #### Load or extract your class labels for each sample
+```
 sample_metadata <- read.csv("sample_metadata.csv") sample_types <- sample_metadata$SampleType
+```
 #### Run the integrated UMAP projection and clustering/misclassification analysis
+```
 results <- umap_ward_misclassification_analysis( data = lipid_profiles, target = sample_types, 
 labels = sample_metadata$SampleID, output_dir = "results")
+```
 #### Output misclassification rate and list which samples were misclassified
+```
 cat("Sample misclassification rate:", sprintf("%.2f%%", results$misclassification_rate * 100), "\n")
 if (!is.null(resultsmisclassified_samples) && nrow(resultsmisclassified_samples) > 0) { cat("Misclassified samples:\n") print(results$misclassified_samples) } else { cat("No misclassified samples.\n") }
+```
 #### Optionally: view UMAP plot object, if provided
+```
 print(results$umap_plot)
 print(results$voronoi_plot)
-
+```
 <img src="./umap_analysis_combined.svg">
 
 ---
@@ -84,10 +93,6 @@ To generate the example data:
 
 ## Citation
 
-If you use this tool in your work, please cite the repository or contact the maintainer for citation details.
+If you use this tool in your work, please cite the repository or contact the maintainer for citation details. <tbd>
 
 ---
-
-## License
-
-Distributed under the MIT License. See `LICENSE` for more information.
