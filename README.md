@@ -36,10 +36,8 @@ lipid_profiles <- read.csv("lipid_profiles.csv")
 #### Load or extract your class labels for each sample
 sample_metadata <- read.csv("sample_metadata.csv") sample_types <- sample_metadata$SampleType
 #### Run the integrated UMAP projection and clustering/misclassification analysis
-results <- umap_ward_misclassification_analysis( data = lipid_profiles, # Features data 
-  target = sample_types, # Ground truth (prior classes) 
-  labels = sample_metadata$SampleID, # Optional: row labels for plots, if available 
-  output_dir = 
+results <- umap_ward_misclassification_analysis( data = lipid_profiles, target = sample_types, 
+labels = sample_metadata$SampleID, output_dir = "results")
 #### Output misclassification rate and list which samples were misclassified
 cat("Sample misclassification rate:", sprintf("%.2f%%", results$misclassification_rate * 100), "\n")
 if (!is.null(resultsmisclassified_samples) && nrow(resultsmisclassified_samples) > 0) { cat("Misclassified samples:\n") print(results$misclassified_samples) } else { cat("No misclassified samples.\n") }
