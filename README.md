@@ -40,7 +40,6 @@ results <- umap_ward_misclassification_analysis( data = lipid_profiles, # Featur
 #### Output misclassification rate and list which samples were misclassified
 cat("Sample misclassification rate:", sprintf("%.2f%%", results$misclassification_rate * 100), "\n")
 if (!is.null(resultsmisclassified_samples) && nrow(resultsmisclassified_samples) > 0) { cat("Misclassified samples:\n") print(results$misclassified_samples) } else { cat("No misclassified samples.\n") }
-<<<<<<< Updated upstream
 #### Optionally: view UMAP plot object, if provided
 print(results$umap_plot)
 print(results$voronoi_plot)
