@@ -1,6 +1,6 @@
 # umap_ward_misclassification_analysis
 
-## Overview?
+## Overview
 
 Laboratory errors can produce topically plausible but incorrect results. This package integrates dimensionality reduction (UMAP) with cluster analysis (Ward’s hierarchical clustering) to detect such errors through an intuitive visual framework, enabling researchers to identify problematic samples before they impact downstream analyses.
 
