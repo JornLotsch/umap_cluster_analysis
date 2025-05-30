@@ -1,12 +1,10 @@
 # UMAP Ward misclassification analysis
 This R code provides a comprehensive workflow for performing UMAP projection, Ward clustering, and misclassification analysis on high-dimensional data. It's particularly useful for quality control and exploratory data analysis in omics studies.
 ## Functions
-### `check_and_install_packages(pkg_list)`
+#### `check_and_install_packages(pkg_list)`
 **Description**: Utility function that checks for missing R packages and automatically installs them from CRAN.
 **Parameters**:
-- : Character vector of package names to check and install `pkg_list`
-
-<<<<<<< HEAD
+- pkg_list: Character vector of package names to check and install `pkg_list`
 **Returns**:
 - No return value (NULL). Installs missing packages and loads all required packages
 - Throws an error if any packages fail to load after installation
@@ -16,7 +14,7 @@ This R code provides a comprehensive workflow for performing UMAP projection, Wa
 required_packages <- c("ggplot2", "umap", "cluster")
 check_and_install_packages(required_packages)
 ```
-### `source_required_functions()`
+#### `source_required_functions()`
 **Description**: Sources all required analysis functions from the current working directory.
 **Parameters**: None
 **Returns**:
@@ -48,6 +46,8 @@ check_and_install_packages(required_packages)
 | `height` | numeric | 9 | Plot height in inches |
 | `dpi` | integer | 300 | Resolution for PNG output |
 | `n_neighbors` | integer | 15 | Number of nearest neighbors for UMAP |
+
+
 #### Returns
 A named list containing the following components:
 
@@ -86,6 +86,7 @@ results <- umap_ward_misclassification_analysis(
   width = 14,
   height = 10
 )
+```
 =======
 ## Overview
 
@@ -119,65 +120,66 @@ Clone this repository and source the function in your R environment:
 Below is a complete example of running UMAP-based clustering and checking for misclassifications.
 
 #### Load your data frame: each row is a sample, each column a feature (e.g., lipid species)
-```
+```r
 lipid_profiles <- read.csv("lipid_profiles.csv")
 ```
 #### Load or extract your class labels for each sample
-```
+```r
 sample_metadata <- read.csv("sample_metadata.csv") sample_types <- sample_metadata$SampleType
 ```
 #### Run the integrated UMAP projection and clustering/misclassification analysis
-```
+```r
 results <- umap_ward_misclassification_analysis( data = lipid_profiles, target = sample_types, 
 labels = sample_metadata$SampleID, output_dir = "results")
 ```
 #### Output misclassification rate and list which samples were misclassified
-```
+```r
 cat("Sample misclassification rate:", sprintf("%.2f%%", results$misclassification_rate * 100), "\n")
 if (!is.null(resultsmisclassified_samples) && nrow(resultsmisclassified_samples) > 0) {
 cat("Misclassified samples:\n") print(results$misclassified_samples) } else { cat("No misclassified samples.\n")
 }
 ```
 #### Optionally: view UMAP plot object, if provided
-```
+```r
 print(results$umap_plot)
 print(results$voronoi_plot)
 ```
 <img src="./umap_analysis_combined.svg">
->>>>>>> origin/main
 
-# Check misclassification rate
+#### Check misclassification rate
+```r
 cat("Misclassification rate:", 
     sprintf("%.2f%%", results$misclassification_rate * 100), "\n")
-
-<<<<<<< HEAD
-# View misclassified samples
+```
+#### View misclassified samples
+```r
 if (nrow(results$misclassified_samples) > 0) {
   print(results$misclassified_samples)
 }
+```
 =======
-## Simulated example data set
->>>>>>> origin/main
+#### Simulated example data set
 
-# Access individual components
+#### Access individual components
+```r
 umap_coordinates <- results$umap_result$Projected
 cluster_assignments <- results$cluster_result$clusters
 ```
-## Dependencies
+### Dependencies
 The package automatically installs and loads the following R packages:
-- : Data visualization `ggplot2`
+- `ggplot2`: Data visualization 
 - `tidyr`: Data manipulation
 - `scales`: Plot scaling functions
 - `deldir`: Voronoi tessellation
 - `umap`: UMAP dimensionality reduction
-- : Combining plots `gridExtra`
+- `gridExtra`: Combining plots 
 
-## Requirements
+### Requirements
 - R >= 3.6.0
 - External function files (listed in ) `source_required_functions()`
 - Write permissions in the output directory
 
-## Error Handling
+### Error Handling
 The function includes comprehensive input validation:
 - Checks data types and dimensions
 - Validates parameter ranges and formats
@@ -185,34 +187,6 @@ The function includes comprehensive input validation:
 - Verifies directory permissions
 - Provides informative error messages for troubleshooting
 
-<<<<<<< HEAD
-=======
-# See create_sample_lipidomics_data.R in the repository for reproducible example data creation.
-
----
-
-## Function arguments
-
-- `data`: Data frame or matrix of numeric features (samples in rows, features in columns).
-- `target`: Vector or factor of true class labels.
-- `labels`: (Optional) Row labels for plotting and output (e.g., sample IDs).
-- `output_dir`: (Optional) Directory to save SVG/PNG plots and QC outputs.
-- `n_neighbors`: *(Optional, default = 15)* Integer; the size of the local neighborhood used by UMAP for manifold approximation. Adjust to control the local/global structure captured in the projection.
-
----
-
-## Output explanation
-
-- **misclassification_rate**: Fraction of samples assigned to the wrong cluster, compared to ground truth labels.
-- **misclassified_samples**: Data frame listing the misclassified samples, their IDs, true labels, and predicted clusters.
-- **voronoi_plot**: R `ggplot2` object for the UMAP visualization (can be customized or exported).
-- **qc_results directory**: Contains publication-ready SVG/PNG plots and summary tables of clustering results.
-
----
-
 ## Citation
 
 If you use this tool in your work, please cite the repository or contact the maintainer for citation details. <tbd>
-
----
->>>>>>> origin/main
