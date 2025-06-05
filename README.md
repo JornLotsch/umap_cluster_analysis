@@ -1,5 +1,10 @@
 # UMAP Ward misclassification analysis
 This R code provides a comprehensive workflow for performing UMAP projection, Ward clustering, and misclassification analysis on high-dimensional data. It's particularly useful for quality control and exploratory data analysis in omics studies.
+
+## Installation
+
+You can download this code to you local hard drive and run it from there. 
+
 ## Functions
 ### `check_and_install_packages(pkg_list)`
 **Description**: Utility function that checks for missing R packages and automatically installs them from CRAN.
